@@ -8,4 +8,26 @@ d=-c;
 e=-2.45;
 f=9;
 g=9.55e-10;
+
+type
+atom = record
+electrons: real;
+neutrons: integer;
+end;
+SUMMER = (April, May, June, July, September);
+vector = array [ 1..25] of real;
+days, age = integer;
+yes, true = boolean;
+fees, expenses = real;
+
+var
+age, weekdays : integer;
+taxrate, netincome: real;
+choice, isready: boolean;
+initials, grade: char;
+
+procedure findMin(x, y, z: integer; m,w: real);
+procedure findMEEEE;
+function max(num1, num2: integer): boolean;
+function melon: real;
 .
