@@ -125,9 +125,11 @@ lexer = lex.lex()
 with open('test.txt', 'r') as file:
     data = file.read()
 lexer.input(data)
-for token in lexer:
-    print("line %d: %s(%s)" %(token.lineno, token.type, token.value))
+#for token in lexer:
+    #print("line %d: %s(%s)" %(token.lineno, token.type, token.value))
 
+id_list=[]
+type1=""
 
 def p_pascal_program(p):
     'pascal_program : pogram_header SEMI_COLON block DOT'
@@ -135,13 +137,14 @@ def p_pascal_program(p):
 def p_program_header(p):
     'pogram_header : PROGRAM_SYM ID'
     print("//Program: "+p[2])
+    print("include <stdio.h>")
+    print("include <stdbool.h>")
 def p_block(p):
     'block : const_block type_block var_block'# procedure_and_function_block operation_block'
     pass
 def p_const_block(p):
     '''const_block : CONST_SYM const_def SEMI_COLON const_def_list
                     | empty'''
-    pass
 
 def p_const_def_list(p):
     '''const_def_list : const_def_list const_def SEMI_COLON
@@ -155,7 +158,7 @@ def p_constid(p):
     print("#define "+p[1]+" ",end=" ")
 def p_id(p):
     'id : ID'
-    print(p[1],end=" ")
+    print(p[1],end="")
 def p_const_value(p):
     '''const_value : ID
                     | sign id
@@ -187,6 +190,10 @@ def p_e(p):
     if p[1] !='e':
         print("Syntax error in input!")
     else: print(p[1], end="")
+
+
+
+
 def p_type_block(p):
     '''type_block : TYPE_SYM type_def SEMI_COLON type_def_list
                     | empty'''
@@ -194,56 +201,141 @@ def p_type_block(p):
 def p_type_def_list(p):
     '''type_def_list : type_def_list type_def SEMI_COLON
                     | empty'''
-    pass
+    print(';')
 def p_type_def(p):
-    '''type_def : ID EQUAL type_denoter'''
-    pass
+    '''type_def : id_list EQUAL type_denoter_td'''
+    for i in id_list:
+        if i!= id_list[-1]:
+            print(i,end=", ")
+        else:
+            print(i,end="")
+    id_list.clear()
 def p_type_denoter(p):
     '''type_denoter : type_general
                     | enumerated_type
                     | array_type
                     | record_type
-                    | ID'''
+                    | id'''
+    pass
+def p_type_denoter_td(p):
+    '''type_denoter_td : type_general_td
+                    | enumerated_type_td
+                    | array_type_td
+                    | record_type_td'''
     pass
 def p_type_general(p):
     '''type_general : CHAR_SYM
                     | INTEGER_SYM
                     | REAL_SYM
-                    | BOOLEAN_SYM
-                    | STRING_SYM'''
-    pass
+                    | BOOLEAN_SYM'''
+    if p[1] == 'integer':
+        print("int",end=" ")
+        type1 ="int"
+    elif p[1] == 'real':
+        print("double", end=" ")
+        type1 ="double"
+    elif p[1] == 'char':
+        print("char", end=" ")
+        type1 ="char"
+    elif p[1] == 'boolean':
+        print("bool", end=" ")
+        type1 = "bool"
+def p_type_general_td(p):
+    '''type_general_td : CHAR_SYM
+                    | INTEGER_SYM
+                    | REAL_SYM
+                    | BOOLEAN_SYM'''
+    if p[1] == 'integer':
+        print("typedef int",end=" ")
+        type1 ="int"
+    elif p[1] == 'real':
+        print("typedef double", end=" ")
+        type1 ="double"
+    elif p[1] == 'char':
+        print("typedef char", end=" ")
+        type1 ="char"
+    elif p[1] == 'boolean':
+        print("typedef bool", end=" ")
+        type1 = "bool"
 def p_enumerated_type(p):
     '''enumerated_type : NAWL id_list NAWR'''
-    pass
+    print("enum "+id_list.pop(0)+" {",end="")
+    for i in id_list:
+        if i!= id_list[-1]:
+            print(i,end=", ")
+        else:
+            print(i,end="")
+    print("}", end="")
+    id_list.clear()
+def p_enumerated_type_td(p):
+    '''enumerated_type_td : NAWL id_list NAWR'''
+    print("typedef enum "+" {",end="")
+    for i in id_list:
+        if i!= id_list[-1]:
+            print(i,end=", ")
+        else:
+            print(i,end="")
+    print("}"+id_list.pop(0), end="")
+    id_list.clear()
 def p_id_list(p):
     '''id_list : ID
                 | id_list COMMA ID'''
-    pass
+    if p[1] is not None:
+        id_list.append(p[1])
+    else: id_list.append(p[3])
 def p_array_type(p):
-    '''array_type : ARRAY_SYM NAWKL NUMBER DOUBLE_DOT NUMBER NAWKR OF_SYM type_denoter
-                | ARRAY_SYM NAWKL sign NUMBER DOUBLE_DOT NUMBER NAWKR OF_SYM type_denoter
-                | ARRAY_SYM NAWKL NUMBER DOUBLE_DOT sign NUMBER NAWKR OF_SYM type_denoter
-                | ARRAY_SYM NAWKL sign NUMBER DOUBLE_DOT sign NUMBER NAWKR OF_SYM type_denoter'''
-    pass
+    '''array_type : ARRAY_SYM NAWKL NUMBER DOUBLE_DOT NUMBER NAWKR OF_SYM type_denoter'''
+    size= str(int(p[5])-int(p[3]))
+    print(type1 + id_list.pop(0) + "["+size+"]",end="")
+def p_array_type_td(p):
+    '''array_type_td : ARRAY_SYM NAWKL NUMBER DOUBLE_DOT NUMBER NAWKR OF_SYM type_denoter_td'''
+    size= str(int(p[5])-int(p[3]))
+    print(type1 + id_list.pop(0) + "["+size+"]",end="")
 def p_record_type(p):
-    '''record_type : RECORD_SYM END_SYM
-                | RECORD_SYM record_section record_section_list  SEMI_COLON END_SYM
-                | RECORD_SYM record_section  record_section_list END_SYM'''
+    '''record_type :  record_sym record_section record_section_list  SEMI_COLON rec_end_sym'''
     pass
+def p_record_type_td(p):
+    '''record_type_td :  record_sym_td record_section record_section_list  SEMI_COLON rec_end_sym_td'''
+    pass
+def p_rec_end_sym(p):
+    '''rec_end_sym :  END_SYM'''
+    print("}",end="")
+text=[]
+def p_rec_end_sym_td(p):
+    '''rec_end_sym_td :  END_SYM'''
+    print("}"+text.pop(0),end="")
+def p_record_sym(p):
+    '''record_sym :  RECORD_SYM'''
+    print("struct "+id_list.pop(0)+ "{")
+def p_record_sym_td(p):
+    '''record_sym_td :  RECORD_SYM'''
+    print("typedef struct "+ "{")
+    text.append(id_list.pop(0))
 def p_record_section_list(p):
     '''record_section_list : record_section_list SEMI_COLON record_section
                     | empty'''
     pass
 def p_record_section(p):
     '''record_section : id_list COLON type_denoter'''
-    pass
+    print(type1, end=" ")
+    for i in id_list:
+        if i != id_list[-1]:
+            print(i, end=", ")
+        else:
+            print(i, end=";\n")
+    id_list.clear()
 def p_var_block(p):
     '''var_block : VAR_SYM var_decl var_decl_list
                 | empty'''
     pass
 def p_var_decl(p):
     '''var_decl : id_list COLON type_denoter SEMI_COLON'''
-    pass
+    for i in id_list:
+        if i!= id_list[-1]:
+            print(i,end=", ")
+        else:
+            print(i,end=";\n")
+    id_list.clear()
 def p_var_decl_list(p):
     '''var_decl_list : var_decl_list var_decl
                     | empty'''
