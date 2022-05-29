@@ -340,6 +340,78 @@ def p_var_decl_list(p):
     '''var_decl_list : var_decl_list var_decl
                     | empty'''
     pass
+
+
+
+pf_type=[]
+id_list_pom=[]
+def p_procedure_and_function_block(p):
+    '''procedure_and_function_block : procedure_and_function_block procedure_decl
+                                    | procedure_and_function_block function_decl
+                                    | empty'''
+    pass
+def p_procedure_decl(p):
+    '''procedure_decl : procedure_header SEMI_COLON block'''
+    pass
+def p_procedure_header(p):
+    '''procedure_header : PROCEDURE_SYM ID
+                        | PROCEDURE_SYM ID NAWL param_section param_section_list NAWR'''
+    print("void " + p[2] + "(",end="")
+    for i in id_list_pom:
+        if i!= id_list_pom[-1]:
+            print(i,end=", ")
+        else:
+            print(i, end="")
+    print(")", end="\n")
+    id_list_pom.clear()
+    pf_type.clear()
+    id_list.clear()
+def p_param_section(p):
+    '''param_section : id_list COLON type_general_pf'''
+    id_pom=[]
+    for i in id_list:
+        st =pf_type[-1]+" "+i
+        id_pom.append(st)
+    id_list.clear()
+    for i in id_pom:
+        id_list.append(i)
+    pf_type.clear()
+def p_param_section_list(p):
+    '''param_section_list : param_section_list SEMI_COLON param_section
+                        | empty'''
+    for i in id_list:
+        id_list_pom.append(i)
+    id_list.clear()
+def p_type_general_pf(p):
+    '''type_general_pf : CHAR_SYM
+                    | INTEGER_SYM
+                    | REAL_SYM
+                    | BOOLEAN_SYM'''
+    if p[1] == 'integer':
+        pf_type.append("int")
+    elif p[1] == 'real':
+        pf_type.append("double")
+    elif p[1] == 'char':
+        pf_type.append("char")
+    elif p[1] == 'boolean':
+        pf_type.append("bool")
+def p_function_decl(p):
+    '''function_decl : function_header SEMI_COLON block'''
+    pass
+def p_function_header(p):
+    '''function_header : FUNCTION_SYM ID COLON type_general_pf
+                        | FUNCTION_SYM ID NAWL param_section param_section_list NAWR COLON type_general_pf'''
+    print(pf_type.pop(-1) +" "+ p[2] + "(", end="")
+    for i in id_list_pom:
+        if i != id_list_pom[-1]:
+            print(i, end=", ")
+        else:
+            print(i, end="")
+    print(")", end="\n")
+    id_list_pom.clear()
+    id_list_pom.clear()
+    pf_type.clear()
+
 def p_error(p):
     print("Syntax error in input!!!")
 def p_empty(p):
