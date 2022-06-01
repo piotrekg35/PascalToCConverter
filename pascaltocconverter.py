@@ -140,7 +140,7 @@ def p_program_header(p):
     print("include <stdio.h>")
     print("include <stdbool.h>")
 def p_block(p):
-    'block : const_block type_block var_block' # procedure_and_function_block operation_block'
+    'block : const_block type_block var_block procedure_and_function_block' #operation_block'
     pass
 def p_const_block(p):
     '''const_block : CONST_SYM const_def SEMI_COLON const_def_list
