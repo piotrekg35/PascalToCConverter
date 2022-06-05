@@ -137,11 +137,12 @@ def p_pascal_program(p):
 def p_program_header(p):
     'pogram_header : PROGRAM_SYM ID'
     print("//Program: "+p[2])
-    print("include <stdio.h>")
-    print("include <stdbool.h>")
+    print("#include <stdio.h>")
+    print("#include <stdbool.h>")
 def p_block(p):
     'block : const_block type_block var_block procedure_and_function_block' #operation_block'
     pass
+constdef=[]
 def p_const_block(p):
     '''const_block : CONST_SYM const_def SEMI_COLON const_def_list
                     | empty'''
@@ -151,29 +152,32 @@ def p_const_def_list(p):
                       | empty'''
     pass
 def p_const_def(p):
-    'const_def : constid EQUAL const_value'
-    print()
-def p_constid(p):
-    'constid : ID'
-    print("#define "+p[1]+" ",end=" ")
+    'const_def : id EQUAL const_value'
+    if str(constdef[-1])[0]=='\"':
+        print("const char "+str(constdef[0])+"["+str(len(str(constdef[-1])))+"] = "+str(constdef[-1])+";")
+    elif str(constdef[-1]).isnumeric():
+        print("const int " + str(constdef[0]) + " = " + str(constdef[-1])+";")
+    else:
+        print("const double " + str(constdef[0]) + " = " + str(constdef[-1])+";")
+    constdef.clear()
 def p_id(p):
     'id : ID'
-    print(p[1],end="")
+    constdef.append(p[1])
 def p_const_value(p):
-    '''const_value : ID
-                    | sign id
+    '''const_value :  sign id
                     | real_number
                     | sign real_number
                     | TEXT'''
     if p[1]is not None and str(p[1])[0]=='\'':
         x=str(p[1])
-        print(x.replace('\'','\"'),end=" ")
-    elif p[1]is not None and str(p[1])[0].isalpha():
-        print(p[1],end=" ")
+        constdef.append(x.replace('\'','\"'))
 def p_sign(p):
     '''sign : OPER_ADD
                     | OPER_SUB'''
-    print(p[1],end="")
+    if len(constdef)==1:
+        constdef.append(p[1])
+    else:
+        constdef.append(str(constdef.pop(-1)) + str(p[1]))
 def p_real_number(p):
     '''real_number : num
                     | num dot num
@@ -181,15 +185,19 @@ def p_real_number(p):
                     | num dot num e sign num'''
 def p_num(p):
     '''num : NUMBER'''
-    print(p[1],end="")
+    if len(constdef) == 1:
+        constdef.append(p[1])
+    else:
+        constdef.append(str(constdef.pop(-1)) + str(p[1]))
 def p_dot(p):
     '''dot : DOT'''
-    print(p[1],end="")
+    constdef.append(str(constdef.pop(-1)) + str(p[1]))
 def p_e(p):
     'e : ID'
     if p[1] !='e':
         print("Syntax error in input!")
-    else: print(p[1], end="")
+    else:
+        constdef.append(str(constdef.pop(-1)) + str(p[1]))
 
 
 
@@ -271,6 +279,8 @@ def p_enumerated_type_td(p):
     '''enumerated_type_td : NAWL id_list NAWR'''
     print("typedef enum "+" {",end="")
     for i in id_list:
+        if i== id_list[0]:
+            continue
         if i!= id_list[-1]:
             print(i,end=", ")
         else:
