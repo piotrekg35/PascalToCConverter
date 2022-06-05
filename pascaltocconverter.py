@@ -34,7 +34,8 @@ reserved = {
     'integer' : 'INTEGER_SYM',
     'real' : 'REAL_SYM',
     'boolean' : 'BOOLEAN_SYM',
-    'string' : 'STRING_SYM',
+    'writeln' : 'WRITELN_SYM',
+    'readln' : 'READLN_SYM'
 }
 
 
@@ -58,7 +59,7 @@ tokens = [
     'NAWR',
     'NAWKL',
     'NAWKR',
-    'ASSING_SYM',
+    'ASSIGN_SYM',
     'NUMBER',
     'ID',
     'TEXT',
@@ -85,7 +86,7 @@ t_NAWL = r'\('
 t_NAWR = r'\)'
 t_NAWKL = r'\['
 t_NAWKR = r'\]'
-t_ASSING_SYM = r':='
+t_ASSIGN_SYM = r':='
 
 def t_NUMBER(t):
   r'[0-9][0-9]*'
@@ -140,7 +141,7 @@ def p_program_header(p):
     print("#include <stdio.h>")
     print("#include <stdbool.h>")
 def p_block(p):
-    'block : const_block type_block var_block procedure_and_function_block' #operation_block'
+    'block : const_block type_block var_block procedure_and_function_block operation_block'
     pass
 constdef=[]
 def p_const_block(p):
@@ -168,8 +169,7 @@ def p_id1(p):
     'id1 : ID'
     print(p[1], end=" ")
 def p_const_value(p):
-    '''const_value :  sign id
-                    | real_number
+    '''const_value :  real_number
                     | sign real_number
                     | TEXT'''
     if p[1]is not None and str(p[1])[0]=='\'':
@@ -180,7 +180,7 @@ def p_sign(p):
                     | OPER_SUB'''
     if len(constdef)==1:
         constdef.append(p[1])
-    else:
+    elif len(constdef)>1:
         constdef.append(str(constdef.pop(-1)) + str(p[1]))
 def p_real_number(p):
     '''real_number : num
@@ -191,7 +191,7 @@ def p_num(p):
     '''num : NUMBER'''
     if len(constdef) == 1:
         constdef.append(p[1])
-    else:
+    elif len(constdef) > 1:
         constdef.append(str(constdef.pop(-1)) + str(p[1]))
 def p_dot(p):
     '''dot : DOT'''
@@ -365,7 +365,7 @@ def p_procedure_and_function_block(p):
                                     | empty'''
     pass
 def p_procedure_decl(p):
-    '''procedure_decl : procedure_header SEMI_COLON block'''
+    '''procedure_decl : procedure_header SEMI_COLON block SEMI_COLON'''
     pass
 def p_procedure_header(p):
     '''procedure_header : PROCEDURE_SYM ID
@@ -410,7 +410,7 @@ def p_type_general_pf(p):
     elif p[1] == 'boolean':
         pf_type.append("bool")
 def p_function_decl(p):
-    '''function_decl : function_header SEMI_COLON block'''
+    '''function_decl : function_header SEMI_COLON block SEMI_COLON'''
     pass
 def p_function_header(p):
     '''function_header : FUNCTION_SYM ID COLON type_general_pf
@@ -433,159 +433,226 @@ def p_empty(p):
     pass
 
 
-# def p_operation_block(p):
-#     'operation_block : BEGIN_SYM statement_sequence END_SYM'
-#     pass
-#
-# def p_statement_sequence(p):
-#     'statement_sequence : statement statement_list'
-#     pass
-#
-# def p_statement_list(p):
-#     '''statement_list : statement_list SEMI_COLON statement
-#                         | empty'''
-#     pass
-#
-# def p_statement(p):
-#     '''statement :  structured_statement''' #simple statement |
-#     pass
+def p_operation_block(p):
+    'operation_block : BEGIN_SYM statement_sequence END_SYM'
+    pass
 
-# def p_simple_statement(p):
-#     '''simple_statement : assign_statement
-#                         | procedure_statement
-#                         | procedure_method_statement
-#                         | empty'''
-#     pass
+def p_statement_sequence(p):
+    'statement_sequence : statement statement_list'
+    pass
 
-# def p_structured_statement(p):
-#     '''structured_statement : conditional_statement
-#                         | repetitive_statement''' #operation_block |
-#     pass
-#
-# def p_repetitive_statement(p):
-#     'repetitive_statement : while_statement'
-#     #'''repetitive_statement : repeat_statement
-#     #                    | while_statement
-#     #                    | for_statement'''
-#     pass
-#
-# def p_while_statement(p):
-#     'while_statement : WHILE_SYM expression DO_SYM statement'
-#     pass
+def p_statement_list(p):
+    '''statement_list : statement_list SEMI_COLON statement
+                        | empty'''
+    pass
 
-# def p_repeat_statement(p):
-#     'repeat_statement : REPEAT_SYM statement_sequence UNTIL_SYM expression'
-#     pass
-#
-# def p_for_statement(p):
-#     '''for_statement : FOR_SYM ID ASSIGN_SYM expression TO_SYM expression
-#                         | FOR_SYM ID ASSIGN_SYM expression DOWNTO_SYM expression'''
-#     pass
-#
-# def p_conditional_statement(p):
-#     '''conditional_statement : if_statement
-#                         | case_statement'''
-#     pass
-#
-# def p_if_statement(p):
-#     '''if_statement : IF_SYM expression THEN_SYM statement else_part
-#                         | IF_SYM expression THEN_SYM statement'''
-#     pass
-#
-# def p_else_part(p):
-#     'else_part : ELSE_SYM statement'
-#     pass
-#
-# def p_case_statement(p):
-#     '''case_statement : CASE_SYM expression case_body SEMI_COLON END_SYM
-#                         | CASE_SYM expression case_body END_SYM'''
-#     pass
-#
-# def p_case_body(p):
-#     '''case_body : case_list_elements SEMI_COLON case_statement_completer
-#                         | case_list_elements case_statement_completer
-#                         | case_statement_completer'''
-#     pass
-#
-# def p_case_list_elements(p):
-#     'case_list_elements : case_list_element case_list_element_list'
-#     pass
-#
-# def p_case_list_element_list(p):
-#     '''case_list_element_list : case_list_element_list SEMI_COLON case_list_element
-#                         | empty'''
-#     pass
-#
-# def p_case_list_element(p):
-#     'case_list_element : case_constant_list COLON statement'
-#     pass
-#
-# def p_case_constant_list(p):
-#     'case_constant_list : case_specifier case_specifier_list'
-#     pass
-#
-# def p_case_specifier_list(p):
-#     '''case_specifier_list : case_specifier_list COMMA case_specifier
-#                         | empty'''
-#     pass
-#
-# def p_case_specifier(p):
-#     '''case_specifier : constant DOUBLE_DOT constant
-#                         | constant'''
-#     pass
-#
-# def p_case_specifier_competer(p):
-#     'case_specifier_completer : ELSE_SYM statement_sequence'
-#     pass
+def p_statement(p):
+    '''statement :  simple_statement
+                    | structured_statement'''
+    pass
 
-# def p_expression(p):
-#     '''expression : simple expression relational_operator simple_expression
-#                         | simple expression'''
-#     pass
-#
-# def p_relational_operator(p):
-#     '''relational_operator : EQUAL
-#                         | NOT_EQUAL
-#                         | LOWER
-#                         | LW_EQ
-#                         | GREATER
-#                         | GR_EQ
-#                         | empty'''
-#     pass
-#
-# def p_simple_expression(p):
-#     'simple_expression : term add_oper_list'
-#     pass
-#
-# def p_add_oper_list(p):
-#     '''add_oper_list : add_oper_list add_oper term
-#                         | empty'''
-#     pass
-#
-# def p_add_oper(p):
-#     '''add_oper : OPER_ADD
-#                         | OPER_SUB
-#                         | OR_SYM'''
-#     pass
-#
-# def p_term(p):
-#     'term : factor factor_list'
-#     pass
-#
-# def p_factor_list(p):
-#     '''factor_list : factor_list mult_oper factor
-#                         | empty'''
-#     pass
-#
-# def p_mult_oper(p):
-#     '''mult_oper : OPER_MULT
-#                         | OPER_DIV
-#                         | DIV_SYM
-#                         | MOD_SYM
-#                         | AND_SYM'''
-#     pass
+def p_simple_statement(p):
+    '''simple_statement : assign_statement
+                        | procedure_statement
+                        | procedure_method_statement
+                        | empty'''
+    pass
 
+def p_structured_statement(p):
+    '''structured_statement : operation_block
+                        | conditional_statement
+                        | repetitive_statement'''
+    pass
 
+def p_repetitive_statement(p):
+    '''repetitive_statement : repeat_statement
+                        | while_statement
+                        | for_statement'''
+    pass
 
+def p_while_statement(p):
+    'while_statement : WHILE_SYM expression DO_SYM statement'
+    pass
+
+def p_repeat_statement(p):
+    'repeat_statement : REPEAT_SYM statement_sequence UNTIL_SYM expression'
+    pass
+
+def p_for_statement(p):
+    '''for_statement : FOR_SYM ID ASSIGN_SYM expression TO_SYM expression
+                        | FOR_SYM ID ASSIGN_SYM expression DOWNTO_SYM expression'''
+    pass
+
+def p_conditional_statement(p):
+    '''conditional_statement : if_statement
+                        | case_statement'''
+    pass
+
+def p_if_statement(p):
+    '''if_statement : IF_SYM expression THEN_SYM statement else_part
+                        | IF_SYM expression THEN_SYM statement'''
+    pass
+
+def p_else_part(p):
+    'else_part : ELSE_SYM statement'
+    pass
+
+def p_case_statement(p):
+    '''case_statement : CASE_SYM expression case_body SEMI_COLON END_SYM
+                        | CASE_SYM expression case_body END_SYM'''
+    pass
+
+def p_case_body(p):
+    '''case_body : case_list_elements SEMI_COLON case_statement_completer
+                        | case_list_elements case_statement_completer
+                        | case_statement_completer'''
+    pass
+
+def p_case_list_elements(p):
+    'case_list_elements : case_list_element case_list_element_list'
+    pass
+
+def p_case_list_element_list(p):
+    '''case_list_element_list : case_list_element_list SEMI_COLON case_list_element
+                        | empty'''
+    pass
+
+def p_case_list_element(p):
+    'case_list_element : case_constant_list COLON statement'
+    pass
+
+def p_case_constant_list(p):
+    'case_constant_list : case_specifier case_specifier_list'
+    pass
+
+def p_case_specifier_list(p):
+    '''case_specifier_list : case_specifier_list COMMA case_specifier
+                        | empty'''
+    pass
+
+def p_case_specifier(p):
+    '''case_specifier : const_value DOUBLE_DOT const_value
+                        | const_value'''
+    pass
+
+def p_case_statement_completer(p):
+    'case_statement_completer : ELSE_SYM statement_sequence'
+    pass
+
+def p_expression(p):
+    '''expression : simple_expression relational_operator simple_expression
+                        | simple_expression'''
+    pass
+
+def p_relational_operator(p):
+    '''relational_operator : EQUAL
+                        | NOT_EQUAL
+                        | LOWER
+                        | LW_EQ
+                        | GREATER
+                        | GR_EQ
+                        | empty'''
+    pass
+
+def p_simple_expression(p):
+    'simple_expression : term add_oper_list'
+    pass
+
+def p_add_oper_list(p):
+    '''add_oper_list : add_oper_list add_oper term
+                        | empty'''
+    pass
+
+def p_add_oper(p):
+    '''add_oper : OPER_ADD
+                        | OPER_SUB
+                        | OR_SYM'''
+    pass
+
+def p_term(p):
+    'term : factor factor_list'
+    pass
+
+def p_factor_list(p):
+    '''factor_list : factor_list mult_oper factor
+                        | empty'''
+    pass
+
+def p_mult_oper(p):
+    '''mult_oper : OPER_MULT
+                        | OPER_DIV
+                        | DIV_SYM
+                        | MOD_SYM
+                        | AND_SYM'''
+    pass
+
+def p_factor(p):
+    '''factor : real_number
+            | NAWL expression NAWR
+            | NOT_SYM factor'''
+    pass
+
+def p_assign_statement(p):
+    '''assign_statement : assign_statement_lhs ASSIGN_SYM expression'''
+    pass
+
+def p_indexed_variable(p):
+    '''indexed_variable : variable_access NAWKL expression expression_list NAWKR '''
+    pass
+
+def p_expression_list(p):
+    '''expression_list : expression_list COMMA expression
+                        | empty'''
+    pass
+
+def p_component_variable(p):
+    '''component_variable : indexed_variable
+                        | field_designator'''
+    pass
+
+def p_field_designator(p):
+    '''field_designator : variable_access DOT ID
+                        | ID'''
+    pass
+
+def p_selected_variable(p):
+    '''selected_variable : variable_access NAWKL expression expression_list NAWKR'''
+    pass
+
+def p_variable_access(p):
+    '''variable_access : ID
+                        | component_variable
+                        | selected_variable'''
+    pass
+
+def p_assign_statement_lhs(p):
+    '''assign_statement_lhs : variable_access
+                            | ID
+                            | property_designator'''
+    pass
+
+def p_property_designator(p):
+    '''property_designator : variable_access DOT property_specifier'''
+    pass
+
+def p_property_specifier(p):
+    '''property_specifier : ID
+                            | NAWL expression NAWR'''
+    pass
+
+def p_procedure_statement(p):
+    '''procedure_statement : ID NAWL const_value_list NAWR
+                            | WRITELN_SYM NAWL const_value_list NAWR
+                            | READLN_SYM NAWL id_list NAWR'''
+    pass
+
+def p_const_value_list(p):
+    '''const_value_list : const_value_list COMMA const_value
+                            | empty'''
+    pass
+
+def p_procedure_method_statement(p):
+    '''procedure_method_statement : variable_access DOT ID'''
+    pass
 parser = yacc.yacc()
 result = parser.parse(data)
