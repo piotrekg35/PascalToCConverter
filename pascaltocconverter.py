@@ -641,8 +641,10 @@ def p_property_specifier(p):
     pass
 
 def p_procedure_statement(p):
-    '''procedure_statement : ID NAWL const_value_list NAWR
-                            | WRITELN_SYM NAWL const_value_list NAWR
+    '''procedure_statement : ID NAWL const_value const_value_list NAWR
+                            | ID NAWL NAWR
+                            | WRITELN_SYM NAWL const_value const_value_list NAWR
+                            | WRITELN_SYM NAWL NAWR
                             | READLN_SYM NAWL id_list NAWR'''
     pass
 
