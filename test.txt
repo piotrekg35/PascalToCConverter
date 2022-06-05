@@ -3,11 +3,9 @@ const
 PI = 3.141592654;
 a = 3e-2;
 b='alaa';
-c=b;
-d=-c;
-e=-2.45;
-f=9;
-g=9.55e-10;
+c=-2.45;
+d=9;
+e=9.55e-10;
 
 type
 atom = record
@@ -22,12 +20,25 @@ fees, expenses = real;
 
 var
 age, weekdays : integer;
-taxrate, netincome: real;
+taxrate, netincome: atom;
 choice, isready: boolean;
-initials, grade: char;
 
 procedure findMin(x, y, z: integer; m,w: real);
-procedure findMEEEE;
+begin
+    writeln()
+end;
+procedure findXYZ;
+begin
+    c:=4
+end;
 function max(num1, num2: integer): boolean;
+begin
+    writeln('Ala')
+end;
 function melon: real;
-.
+begin
+    findXYZ()
+end;
+begin
+    writeln('Ala ma kota')
+end.
