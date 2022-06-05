@@ -163,6 +163,10 @@ def p_const_def(p):
 def p_id(p):
     'id : ID'
     constdef.append(p[1])
+
+def p_id1(p):
+    'id1 : ID'
+    print(p[1], end=" ")
 def p_const_value(p):
     '''const_value :  sign id
                     | real_number
@@ -223,7 +227,7 @@ def p_type_denoter(p):
                     | enumerated_type
                     | array_type
                     | record_type
-                    | id'''
+                    | id1'''
     pass
 def p_type_denoter_td(p):
     '''type_denoter_td : type_general_td
