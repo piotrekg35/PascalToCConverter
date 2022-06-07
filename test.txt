@@ -33,15 +33,11 @@ begin
 end;
 function max(num1, num2: integer): boolean;
 begin
-    writeln('Ala')
-end;
-function melon: real;
-begin
-    findXYZ()
+    writeln('Ala',5.5,44)
 end;
 begin
-    if then else
-end;
-begin
-    if then else
+    x:=79;
+    y:=3.14;
+    z:=1e-4;
+    v:= 3<>4
 end.
