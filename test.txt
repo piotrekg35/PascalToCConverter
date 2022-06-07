@@ -40,5 +40,8 @@ begin
     findXYZ()
 end;
 begin
-    writeln('Ala ma kota')
+    if then else
+end;
+begin
+    if then else
 end.
