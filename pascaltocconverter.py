@@ -208,8 +208,14 @@ def p_id1(p):
 
 def p_id2(p):
     """id2 : ID"""
-    statement_seq.append(str(p[1]) + " = ")
+    if len(statement_seq) > 0 and statement_seq[-1][-1]=="\t":
+        statement_seq[-1] = statement_seq[-1] + str(p[1])+" = "
+    else:
+        statement_seq.append(str(p[1]) + " = ")
 
+def p_id3(p):
+    'id3 : ID'
+    statement_seq.append(str(p[1]) + "(")
 
 def p_const_value(p):
     """const_value :  real_number
@@ -608,7 +614,7 @@ def p_simple_statement(p):
 
 
 def p_structured_statement(p):
-    """structured_statement : operation_block
+    """structured_statement : operation_sub_block
                         | conditional_statement
                         | repetitive_statement"""
     pass
@@ -622,10 +628,22 @@ def p_repetitive_statement(p):
 
 
 def p_while_statement(p):
-    """while_statement : WHILE_SYM expression DO_SYM statement"""
+    """while_statement : while expression do statement"""
     pass
 
+def p_while(p):
+    """while : WHILE_SYM"""
+    statement_seq.append("while(")
 
+def p_do(p):
+    """do : DO_SYM"""
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + ")\n\t{\n\t"
+
+def p_operation_sub_block(p):
+    """operation_sub_block : BEGIN_SYM statement_sequence END_SYM"""
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + ";\n\t}"
 def p_repeat_statement(p):
     """repeat_statement : REPEAT_SYM statement_sequence UNTIL_SYM expression"""
     pass
@@ -692,7 +710,8 @@ def p_add_oper(p):
     """add_oper : OPER_ADD
                         | OPER_SUB
                         | OR_SYM"""
-    pass
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + str(p[1])
 
 
 def p_term(p):
@@ -712,14 +731,18 @@ def p_mult_oper(p):
                         | DIV_SYM
                         | MOD_SYM
                         | AND_SYM"""
-    pass
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + str(p[1])
 
 
 def p_factor(p):
     """factor : real_number
+            | ID
             | NAWL expression NAWR
             | NOT_SYM factor"""
-    pass
+    if p[1] is not None and p[1]!="(" and p[1]!="not":
+        if len(statement_seq) > 0:
+            statement_seq[-1] = statement_seq[-1] + str(p[1])
 
 
 def p_assign_statement(p):
@@ -728,33 +751,39 @@ def p_assign_statement(p):
 
 
 def p_procedure_statement(p):
-    """procedure_statement : ID NAWL const_value const_value_list NAWR
-                            | ID NAWL NAWR
+    '''procedure_statement : id3 NAWL const_value const_value_list NAWR
+                            | id3 NAWL NAWR
                             | WRITELN_SYM NAWL const_value const_value_list NAWR
-                            | WRITELN_SYM NAWL NAWR
-                            | READLN_SYM NAWL id_list NAWR"""
-    if p[1] == "writeln" and p[3] is not None:
+                            | WRITELN_SYM NAWL NAWR'''
+    if p[1]=="writeln" and p[3] is not None:
         statement_seq.append("printf()")
-    elif p[1] == "writeln" and p[3] is None:
+    elif p[1]=="writeln" and p[3] is None:
         stat = "printf(\""
         for i in constdef:
-            if str(i)[0] == "\"":
-                stat += "s "
+            if str(i)[0]=="\"":
+                stat+="%s "
             elif str(i).isnumeric():
-                stat += "d "
+                stat += "%d "
             else:
-                stat += "f "
-        stat += "\","
+                stat += "%f "
+        stat+="\","
         for i in constdef:
-            stat += str(i)
-            if i != constdef[-1]:
-                stat += ","
-        stat += ")"
+            stat+=str(i)
+            if i!=constdef[-1]:
+                stat+=","
+        stat+=")"
         constdef.clear()
         statement_seq.append(stat)
+    else:
+        statement_seq[-1]=statement_seq[-1]+")"
 
 
 def p_const_value_list(p):
-    """const_value_list : const_value_list COMMA const_value
+    """const_value_list : const_value_list comma const_value
                             | empty"""
     pass
+
+def p_comma(p):
+    '''comma : COMMA'''
+    if len(statement_seq)>0:
+        statement_seq[-1]=statement_seq[-1]+str(p[1])
