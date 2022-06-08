@@ -136,7 +136,7 @@ id_list_pom = []
 isMain = [True]
 statement_seq = []
 constdef = []
-
+id_in_loop=""
 
 def init(data):
     global outputstr
@@ -650,10 +650,33 @@ def p_repeat_statement(p):
 
 
 def p_for_statement(p):
-    """for_statement : FOR_SYM ID ASSIGN_SYM expression TO_SYM expression
-                        | FOR_SYM ID ASSIGN_SYM expression DOWNTO_SYM expression"""
+    """for_statement : for_id ASSIGN_SYM expression to_downto expression for_do statement"""
     pass
 
+def p_for_id(p):
+    """for_id : FOR_SYM ID"""
+    global  id_in_loop
+    statement_seq.append("for("+str(p[2])+"=")
+    id_in_loop=str(p[2])
+
+def p_to_downto(p):
+    """to_downto : TO_SYM
+                | DOWNTO_SYM"""
+    global id_in_loop
+    if len(statement_seq) > 0:
+        if p[1]=="to":
+            statement_seq[-1] = statement_seq[-1] +";"+id_in_loop+">="
+            id_in_loop = id_in_loop+"+"
+        else:
+            statement_seq[-1] = statement_seq[-1] + ";" + id_in_loop + "<="
+            id_in_loop = id_in_loop + "-"
+def p_for_do(p):
+    """for_do : DO_SYM"""
+    if len(statement_seq) > 0:
+        if id_in_loop[-1] == "+":
+            statement_seq[-1] = statement_seq[-1] +";++"+id_in_loop[:-1]+"){\n\t"
+        else:
+            statement_seq[-1] = statement_seq[-1] + ";--" + id_in_loop[:-1]+"){\n\t"
 
 def p_conditional_statement(p):
     """conditional_statement : if_statement"""
