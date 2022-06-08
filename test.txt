@@ -44,4 +44,14 @@ begin
         x:=x/2;
         writeln('0.5x');
     end;
+    for x := 0 to 7 do
+    begin
+        y:=y-3;
+        writeln('ala');
+    end;
+    for x := 7 downto 0 do
+    begin
+        y:=y-3;
+        writeln('ala');
+    end;
 end.
