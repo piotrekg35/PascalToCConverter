@@ -645,6 +645,7 @@ def p_conditional_statement(p):
 def p_if_statement(p):
     """if_statement : IF_SYM expression THEN_SYM statement else_part
                         | IF_SYM expression THEN_SYM statement"""
+    statement_seq.append("if (" + statement_seq.pop() + ")")
     pass
 
 
