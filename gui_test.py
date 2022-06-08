@@ -22,7 +22,7 @@ greeting.pack()
 btnTK = tk.Button(text="convert", command=helloCallBack)
 btnTK.pack()
 
-inputTK = tk.Text(master=window, width=30, height=20, fg="white", bg="black")
+inputTK = tk.Text(master=window, width=30, height=20, fg="white", bg="black", insertbackground="white")
 inputTK.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
 inputTK.insert(1.0, text)

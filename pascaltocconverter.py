@@ -314,7 +314,7 @@ def p_type_general(p):
                     | INTEGER_SYM
                     | REAL_SYM
                     | BOOLEAN_SYM"""
-    global outputstr
+    global outputstr, type1
     if p[1] == 'integer':
         outputstr += "int "  # ,end=" ")
         type1 = "int"
@@ -334,7 +334,7 @@ def p_type_general_td(p):
                     | INTEGER_SYM
                     | REAL_SYM
                     | BOOLEAN_SYM"""
-    global outputstr
+    global outputstr, type1
     if p[1] == 'integer':
         outputstr += "typedef int "  # ,end=" ")
         type1 = "int"
@@ -643,8 +643,8 @@ def p_conditional_statement(p):
 
 
 def p_if_statement(p):
-    """if_statement : IF_SYM THEN_SYM statement else_part
-                        | IF_SYM THEN_SYM ELSE_SYM"""
+    """if_statement : IF_SYM expression THEN_SYM statement else_part
+                        | IF_SYM expression THEN_SYM statement"""
     pass
 
 
