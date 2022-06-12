@@ -22,17 +22,16 @@ reserved = {
     'procedure': 'PROCEDURE_SYM',
     'program': 'PROGRAM_SYM',
     'record': 'RECORD_SYM',
-    'repeat': 'REPEAT_SYM',
     'then': 'THEN_SYM',
     'to': 'TO_SYM',
     'type': 'TYPE_SYM',
-    'until': 'UNTIL_SYM',
     'var': 'VAR_SYM',
     'while': 'WHILE_SYM',
     'char': 'CHAR_SYM',
     'integer': 'INTEGER_SYM',
     'real': 'REAL_SYM',
     'boolean': 'BOOLEAN_SYM',
+    'string': 'STRING_SYM',
     'writeln': 'WRITELN_SYM',
     'readln': 'READLN_SYM'
 }
@@ -106,12 +105,12 @@ def t_TEXT(t):
 
 def t_SINGLE_LINE_COMMENT(t):
     r"""\(\*[^\*\n]*[^\)\n]*\*\)"""
-    return t
+    return
 
 
 def t_MULTI_LINE_COMMENT(t):
     r"""{[^{}]*}"""
-    return t
+    return
 
 
 def t_newline(t):
@@ -137,6 +136,9 @@ isMain = [True]
 statement_seq = []
 constdef = []
 id_in_loop=""
+declared_id={}
+declared_type={}
+function_name=""
 
 def init(data):
     global outputstr
@@ -188,10 +190,13 @@ def p_const_def(p):
     if str(constdef[-1])[0] == '\"':
         outputstr += "const char " + str(constdef[0]) + "[" + str(len(str(constdef[-1]))) + "] = " + str(
             constdef[-1]) + ";\n"
+        declared_id[str(constdef[0])]="const char*"
     elif str(constdef[-1]).isnumeric():
         outputstr += "const int " + str(constdef[0]) + " = " + str(constdef[-1]) + ";\n"
-    else:
+        declared_id[str(constdef[0])] = "const int"
+    else :
         outputstr += "const double " + str(constdef[0]) + " = " + str(constdef[-1]) + ";\n"
+        declared_id[str(constdef[0])] = "const double"
     constdef.clear()
 
 
@@ -295,6 +300,7 @@ def p_type_def(p):
             outputstr += i + ", "  # ,end=", "
         else:
             outputstr += i  # ,end="")
+        declared_type[str(i)]=type1
     id_list.clear()
 
 
@@ -319,7 +325,8 @@ def p_type_general(p):
     """type_general : CHAR_SYM
                     | INTEGER_SYM
                     | REAL_SYM
-                    | BOOLEAN_SYM"""
+                    | BOOLEAN_SYM
+                    | STRING_SYM"""
     global outputstr, type1
     if p[1] == 'integer':
         outputstr += "int "  # ,end=" ")
@@ -333,6 +340,9 @@ def p_type_general(p):
     elif p[1] == 'boolean':
         outputstr += "bool "  # , end=" ")
         type1 = "bool"
+    elif p[1] == 'string':
+        outputstr += "char "  # , end=" ")
+        type1 = "char*"
 
 
 def p_type_general_td(p):
@@ -353,6 +363,9 @@ def p_type_general_td(p):
     elif p[1] == 'boolean':
         outputstr += "typedef bool "  # , end=" ")
         type1 = "bool"
+    elif p[1] == 'string':
+        outputstr += "char "  # , end=" ")
+        type1 = "char*"
 
 
 def p_enumerated_type(p):
@@ -450,7 +463,6 @@ def p_record_section_list(p):
 def p_record_section(p):
     """record_section : id_list COLON type_denoter"""
     global outputstr
-    outputstr += type1 + " "  # , end=" ")
     for i in id_list:
         if i != id_list[-1]:
             outputstr += i + ", "  # , end=", ")
@@ -470,9 +482,17 @@ def p_var_decl(p):
     global outputstr
     for i in id_list:
         if i != id_list[-1]:
-            outputstr += i + ", "  # ,end=", ")
+            if type1=="char*":
+                outputstr += "char "+ i + "[100], "
+            else:
+                outputstr += i + ", "
         else:
-            outputstr += i + ";\n"  # ,end=";\n")
+            if type1=="char*":
+                outputstr += "char "+ i + "[100];\n"
+            else:
+                outputstr += i + ";\n"
+        declared_id[str(i)]=type1
+
     id_list.clear()
 
 
@@ -554,7 +574,7 @@ def p_function_decl(p):
 def p_function_header(p):
     """function_header : FUNCTION_SYM ID COLON type_general_pf
                         | FUNCTION_SYM ID NAWL param_section param_section_list NAWR COLON type_general_pf"""
-    global outputstr
+    global outputstr,function_name
     isMain[0] = False
     outputstr += pf_type.pop(-1) + " " + p[2] + "("  # , end="")
     for i in id_list_pom:
@@ -566,6 +586,7 @@ def p_function_header(p):
     id_list_pom.clear()
     id_list_pom.clear()
     pf_type.clear()
+    function_name=str(p[2])
 
 
 def p_error(p):
@@ -580,12 +601,15 @@ def p_empty(p):
 
 def p_operation_block(p):
     """operation_block : BEGIN_SYM statement_sequence END_SYM"""
-    global outputstr
+    global outputstr,function_name
     if isMain[0] is True:
         outputstr += "void main()\n"
     outputstr += "{\n"
     for st in statement_seq:
-        outputstr += "\t" + st + ";\n"
+        outputstr += "\t" + st + "\n"
+    if function_name !="":
+        outputstr += "\treturn "+function_name+";\n"
+        function_name=""
     outputstr += "}\n"
     statement_seq.clear()
 
@@ -621,8 +645,7 @@ def p_structured_statement(p):
 
 
 def p_repetitive_statement(p):
-    """repetitive_statement : repeat_statement
-                        | while_statement
+    """repetitive_statement :  while_statement
                         | for_statement"""
     pass
 
@@ -643,10 +666,7 @@ def p_do(p):
 def p_operation_sub_block(p):
     """operation_sub_block : BEGIN_SYM statement_sequence END_SYM"""
     if len(statement_seq) > 0:
-        statement_seq[-1] = statement_seq[-1] + ";\n\t}"
-def p_repeat_statement(p):
-    """repeat_statement : REPEAT_SYM statement_sequence UNTIL_SYM expression"""
-    pass
+        statement_seq[-1] = statement_seq[-1] + "\n\t}"
 
 
 def p_for_statement(p):
@@ -679,21 +699,30 @@ def p_for_do(p):
             statement_seq[-1] = statement_seq[-1] + ";--" + id_in_loop[:-1]+"){\n\t"
 
 def p_conditional_statement(p):
-    """conditional_statement : if_statement"""
+    """conditional_statement : if expression then statement else_part
+                        | if expression then statement"""
     pass
 
 
-def p_if_statement(p):
-    """if_statement : IF_SYM expression THEN_SYM statement else_part
-                        | IF_SYM expression THEN_SYM statement"""
-    statement_seq.append("if (" + statement_seq.pop() + ")")
-    pass
+def p_if(p):
+    """if : IF_SYM"""
+    if len(statement_seq) > 0 and len(statement_seq[-1]) > 6 and statement_seq[-1][-4:]=='else':
+        statement_seq[-1]=str(statement_seq[-1]).replace("else","else if(")
+    else:
+        statement_seq.append("if (")
 
+def p_then(p):
+    """then : THEN_SYM"""
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + ")"
 
 def p_else_part(p):
-    """else_part : ELSE_SYM statement"""
+    """else_part : else statement"""
     pass
-
+def p_else(p):
+    """else : ELSE_SYM"""
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + "\n\telse"
 
 def p_expression(p):
     """expression : simple_expression relational_operator simple_expression
@@ -770,17 +799,21 @@ def p_factor(p):
 
 def p_assign_statement(p):
     """assign_statement : id2 ASSIGN_SYM expression"""
-    pass
+    if len(statement_seq) > 0:
+        statement_seq[-1] = statement_seq[-1] + ";"
 
 
 def p_procedure_statement(p):
     '''procedure_statement : id3 NAWL const_value const_value_list NAWR
                             | id3 NAWL NAWR
                             | WRITELN_SYM NAWL const_value const_value_list NAWR
-                            | WRITELN_SYM NAWL NAWR'''
+                            | WRITELN_SYM NAWL id_list NAWR
+                            | WRITELN_SYM NAWL NAWR
+                            | READLN_SYM NAWL id_list NAWR'''
+
     if p[1]=="writeln" and p[3] is not None:
-        statement_seq.append("printf()")
-    elif p[1]=="writeln" and p[3] is None:
+        statement_seq.append("printf();")
+    elif p[1]=="writeln" and p[3] is None and p[4] is None:
         stat = "printf(\""
         for i in constdef:
             if str(i)[0]=="\"":
@@ -794,11 +827,67 @@ def p_procedure_statement(p):
             stat+=str(i)
             if i!=constdef[-1]:
                 stat+=","
-        stat+=")"
+        stat+=");"
         constdef.clear()
         statement_seq.append(stat)
+    elif p[1]=="writeln" and p[3] is None and p[4] is not None:
+        stat = "printf(\""
+        for i in id_list:
+            if str(i) not in declared_id.keys():
+                raise ("Variable " + str(i) + " not declared! ")
+            elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[
+                declared_id[i]]:
+                stat += "%d "
+            elif "double" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "double" in \
+                    declared_type[declared_id[i]]:
+                stat += "%f "
+            elif "bool" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "bool" in declared_type[
+                declared_id[i]]:
+                stat += "%d "
+            elif "char" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "char" in declared_type[
+                declared_id[i]]:
+                stat += "%s "
+            else:
+                raise ("Error!")
+
+        stat += "\","
+        for i in id_list:
+            stat += str(i)
+            if i != id_list[-1]:
+                stat += ","
+        stat += ");"
+        id_list.clear()
+        statement_seq.append(stat)
+    elif p[1]=="readln":
+        stat = "scanf(\""
+        for i in id_list:
+            if str(i) not in declared_id.keys():
+                raise ("Variable "+str(i)+" not declared! ")
+            elif "const" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "const" in declared_type[declared_id[i]]:
+                raise ("Cannot modify const!")
+            elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[declared_id[i]]:
+                stat += "%d "
+            elif "double" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "double" in declared_type[declared_id[i]]:
+                stat += "%f "
+            elif "bool" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "bool" in declared_type[declared_id[i]]:
+                stat += "%d "
+            elif "char" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "char" in declared_type[declared_id[i]]:
+                stat += "%s "
+            else:
+                raise ("Error!")
+
+        stat += "\","
+        for i in id_list:
+            if "*" not in str(declared_id[i]):
+                stat+="&"
+            stat += str(i)
+            if i != id_list[-1]:
+                stat += ","
+        stat += ");"
+        id_list.clear()
+        statement_seq.append(stat)
     else:
-        statement_seq[-1]=statement_seq[-1]+")"
+        statement_seq[-1]=statement_seq[-1]+");"
 
 
 def p_const_value_list(p):
