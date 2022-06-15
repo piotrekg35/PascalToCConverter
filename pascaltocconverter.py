@@ -5,7 +5,6 @@ reserved = {
     'and': 'AND_SYM',
     'array': 'ARRAY_SYM',
     'begin': 'BEGIN_SYM',
-    'case': 'CASE_SYM',
     'const': 'CONST_SYM',
     'div': 'DIV_SYM',
     'do': 'DO_SYM',
