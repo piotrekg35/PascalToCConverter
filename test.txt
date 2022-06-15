@@ -20,7 +20,5 @@ begin
     writeln('Ala',5.5,44)
 end;
 begin
-    begin
-        writeln('ala');
-    end;
+    writeln('ala');
 end.
