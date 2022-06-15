@@ -1,7 +1,9 @@
-program pr;
+program NewPI;
 const
 PI = 3.141592654;
 
 begin
-    PI:=5;
+    readln(PI);
+    writeln('New PI = ');
+    writeln(PI);
 end.
