@@ -5,7 +5,7 @@ from pascaltocconverter import *
 window = tk.Tk()
 window.title("Pascal to C converter")
 
-with open('test4.txt', 'r') as file:
+with open('examples/test.txt', 'r') as file:
     text = file.read()
 
 
