@@ -812,7 +812,7 @@ def p_procedure_statement(p):
                             | READLN_SYM NAWL id_list NAWR'''
     global outputstr
     if p[1]=="writeln" and p[3] is not None:
-        statement_seq.append("printf();")
+        statement_seq.append("printf(\"\\n\");")
     elif p[1]=="writeln" and p[3] is None and p[4] is None:
         stat = "printf(\""
         for i in constdef:
@@ -822,6 +822,7 @@ def p_procedure_statement(p):
                 stat += "%d "
             else:
                 stat += "%f "
+        stat+="\\n"
         stat+="\","
         for i in constdef:
             stat+=str(i)
@@ -851,7 +852,7 @@ def p_procedure_statement(p):
             else:
                 outputstr += "Error!"
                 raise ("Error!")
-
+        stat += "\\n"
         stat += "\","
         for i in id_list:
             stat += str(i)
@@ -880,6 +881,8 @@ def p_procedure_statement(p):
             else:
                 outputstr += "Error!"
                 raise ("Error!")
+            if i==id_list[-1]:
+                stat=stat[:-1]
 
         stat += "\","
         for i in id_list:
