@@ -17,8 +17,8 @@ def helloCallBack():
         outputTK.insert(1.0, final_data)
         with open('results.txt', 'w') as file2:
             file2.write(final_data)
-    except Exception:
-        outputTK.insert(1.0, Exception)
+    except Exception as e:
+        outputTK.insert(1.0, str(e))
 
 
 greeting = tk.Label(text="Pascal to C converter")
