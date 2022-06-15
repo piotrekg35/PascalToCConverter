@@ -1,0 +1,21 @@
+program pr;
+const
+PI = 3.141592654;
+a = 3e-2;
+b='alaa';
+
+var
+age, weekdays : integer;
+taxrate, netincome: atom;
+choice, isready: boolean;
+
+procedure findMin(x, y, z: integer; m,w: real);
+begin
+    max(1,3)
+end;
+function max(num1, num2: integer): boolean;
+begin
+    writeln('Ala',5.5,44)
+end;
+begin
+end.

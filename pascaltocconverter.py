@@ -810,7 +810,7 @@ def p_procedure_statement(p):
                             | WRITELN_SYM NAWL id_list NAWR
                             | WRITELN_SYM NAWL NAWR
                             | READLN_SYM NAWL id_list NAWR'''
-
+    global outputstr
     if p[1]=="writeln" and p[3] is not None:
         statement_seq.append("printf();")
     elif p[1]=="writeln" and p[3] is None and p[4] is None:
@@ -834,6 +834,7 @@ def p_procedure_statement(p):
         stat = "printf(\""
         for i in id_list:
             if str(i) not in declared_id.keys():
+                outputstr += "Variable " + str(i) + " not declared! "
                 raise ("Variable " + str(i) + " not declared! ")
             elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[
                 declared_id[i]]:
@@ -848,6 +849,7 @@ def p_procedure_statement(p):
                 declared_id[i]]:
                 stat += "%s "
             else:
+                outputstr += "Error!"
                 raise ("Error!")
 
         stat += "\","
@@ -862,8 +864,10 @@ def p_procedure_statement(p):
         stat = "scanf(\""
         for i in id_list:
             if str(i) not in declared_id.keys():
+                outputstr += "Variable "+str(i)+" not declared! "
                 raise ("Variable "+str(i)+" not declared! ")
             elif "const" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "const" in declared_type[declared_id[i]]:
+                outputstr += "Cannot modify const!"
                 raise ("Cannot modify const!")
             elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[declared_id[i]]:
                 stat += "%d "
@@ -874,6 +878,7 @@ def p_procedure_statement(p):
             elif "char" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "char" in declared_type[declared_id[i]]:
                 stat += "%s "
             else:
+                outputstr += "Error!"
                 raise ("Error!")
 
         stat += "\","

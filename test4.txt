@@ -1,0 +1,14 @@
+program pr;
+const
+PI = 3.141592654;
+
+var
+age, weekdays : integer;
+
+function max(num1, num2: integer): boolean;
+begin
+    writeln('Ala',5.5,44)
+begin
+    y:=5;
+    y:=y-3;
+end.

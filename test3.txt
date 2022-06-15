@@ -1,0 +1,38 @@
+program pr;
+
+type
+atom = record
+electrons: real;
+neutrons: integer;
+end;
+SUMMER = (April, May, June, July, September);
+vector = array [ 1..25] of real;
+days, age = integer;
+yes, true = boolean;
+fees, expenses = real;
+
+var
+age, weekdays : integer;
+taxrate, netincome: atom;
+choice, isready: boolean;
+
+begin
+    x:=79;
+    y:=3.14;
+    z:=1e-4;
+    while x>y do
+    begin
+        x:=x/2;
+        writeln('0.5x');
+    end;
+    for x := 0 to 7 do
+    begin
+        y:=y-3;
+        writeln('ala');
+    end;
+    for x := 7 downto 0 do
+    begin
+        y:=y-3;
+        writeln('ala');
+    end;
+end.
