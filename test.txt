@@ -7,17 +7,19 @@ c=-2.45;
 d=9;
 e=9.55e-10;
 
+function max(num1, num2: integer): integer;
+var
+   result: integer;
+begin
+   if (num1 > num2) then
+      result := num1
+   else
+      result := num2;
+   max := result;
+end;
 procedure findMin(x, y, z: integer; m,w: real);
 begin
     max(1,3)
-end;
-procedure findXYZ;
-begin
-    c:=4
-end;
-function max(num1, num2: integer): boolean;
-begin
-    writeln('Ala',5.5,44)
 end;
 begin
     writeln('ala');
