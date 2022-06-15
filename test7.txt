@@ -1,0 +1,16 @@
+program posneg;
+
+var 
+ nr : integer;
+
+begin
+    writeln('Enter a number:');
+    readln(nr);
+
+    if (nr > 0) then
+        writeln('You enter positive number')
+    else if (nr < 0) then
+        writeln('You enter negative number')
+    else if (nr = 0) then
+        writeln('You enter zero');
+end.
