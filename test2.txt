@@ -1,21 +1,14 @@
-program pr;
-const
-PI = 3.141592654;
-a = 3e-2;
-b='alaa';
-
+program Kwadraty;
 var
-age, weekdays : integer;
-taxrate, netincome: atom;
-choice, isready: boolean;
-
-procedure findMin(x, y, z: integer; m,w: real);
+i,j,kwadrat : integer;
 begin
-    max(1,3)
-end;
-function max(num1, num2: integer): boolean;
-begin
-    writeln('Ala',5.5,44)
-end;
-begin
+    writeln('Podaj liczbe kwadratow,ktora chcesz otrzymac');
+    i:=1;
+    readln(j);
+    while i<=j do
+    begin
+        kwadrat:=i*i;
+        writeln(kwadrat);
+        i:=i+1;
+    end;
 end.
