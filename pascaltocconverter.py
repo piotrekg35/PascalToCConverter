@@ -681,10 +681,10 @@ def p_to_downto(p):
     global id_in_loop
     if len(statement_seq) > 0:
         if p[1]=="to":
-            statement_seq[-1] = statement_seq[-1] +";"+id_in_loop+">="
+            statement_seq[-1] = statement_seq[-1] +";"+id_in_loop+"<="
             id_in_loop = id_in_loop+"+"
         else:
-            statement_seq[-1] = statement_seq[-1] + ";" + id_in_loop + "<="
+            statement_seq[-1] = statement_seq[-1] + ";" + id_in_loop + ">="
             id_in_loop = id_in_loop + "-"
 def p_for_do(p):
     """for_do : DO_SYM"""
@@ -780,7 +780,14 @@ def p_mult_oper(p):
                         | MOD_SYM
                         | AND_SYM"""
     if len(statement_seq) > 0:
-        statement_seq[-1] = statement_seq[-1] + str(p[1])
+        if p[1]=='div':
+            statement_seq[-1] = statement_seq[-1] + "/"
+        elif p[1]=='mod':
+            statement_seq[-1] = statement_seq[-1] + "%"
+        elif p[1]=='and':
+            statement_seq[-1] = statement_seq[-1] + "&&"
+        else:
+            statement_seq[-1] = statement_seq[-1] + str(p[1])
 
 
 def p_factor(p):
@@ -801,6 +808,7 @@ def p_assign_statement(p):
 
 def p_procedure_statement(p):
     '''procedure_statement : id3 NAWL const_value const_value_list NAWR
+                            | id3 NAWL id_list NAWR
                             | id3 NAWL NAWR
                             | WRITELN_SYM NAWL const_value const_value_list NAWR
                             | WRITELN_SYM NAWL id_list NAWR
@@ -886,6 +894,15 @@ def p_procedure_statement(p):
         stat += ");"
         id_list.clear()
         statement_seq.append(stat)
+    elif p[4] is not None:
+        stat=""
+        for i in id_list:
+            stat += str(i)
+            if i != id_list[-1]:
+                stat += ","
+        stat += ");"
+        id_list.clear()
+        statement_seq[-1]=statement_seq[-1]+stat
     else:
         statement_seq[-1]=statement_seq[-1]+");"
 
