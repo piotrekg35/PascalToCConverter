@@ -1,0 +1,16 @@
+program Parzystosc;
+type
+    liczba=integer;
+var
+    i:liczba;
+procedure czyParzysta(a:integer);
+begin
+   if a mod 2 = 0 then writeln('Parzysta')
+   else writeln('Nieparzysta');
+end;
+begin
+    for i:=1 to 10 do
+    begin
+        czyParzysta(i);
+    end;
+end.
