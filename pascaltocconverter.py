@@ -118,9 +118,7 @@ def t_newline(t):
 
 
 def t_error(t):
-    global outputstr
-    outputstr += "Illegal character {} at line {}.".format(t.value[0],t.lexer.lineno) + "\n"
-    t.lexer.skip(1)
+    raise Exception("Illegal character {} at line {}.".format(t.value[0],t.lexer.lineno))
 
 
 outputstr = ""
@@ -270,7 +268,7 @@ def p_e(p):
     """e : ID"""
     global outputstr
     if p[1] != 'e':
-        raise ("Error!")
+        raise Exception("Expected e got {} at line {}".format(str(p[1]),p.lexer.lineno))
     else:
         if len(constdef) > 0:
             constdef.append(str(constdef.pop(-1)) + str(p[1]))
@@ -589,8 +587,7 @@ def p_function_header(p):
 
 
 def p_error(p):
-    global outputstr
-    outputstr += "Syntax error at {}!\n".format(p.value)
+    raise Exception("Syntax error at {}!\n".format(p.value))
 
 
 def p_empty(p):
@@ -834,8 +831,7 @@ def p_procedure_statement(p):
         stat = "printf(\""
         for i in id_list:
             if str(i) not in declared_id.keys():
-                outputstr += "Variable " + str(i) + " not declared! "
-                raise ("Error!")
+                raise Exception("Variable " + str(i) + " not declared! ")
             elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[
                 declared_id[i]]:
                 stat += "%d "
@@ -850,7 +846,7 @@ def p_procedure_statement(p):
                 stat += "%s "
             else:
                 outputstr += "Error!"
-                raise ("Error!")
+                raise Exception("Cannot print this type!")
         stat += "\\n"
         stat += "\","
         for i in id_list:
@@ -864,11 +860,9 @@ def p_procedure_statement(p):
         stat = "scanf(\""
         for i in id_list:
             if str(i) not in declared_id.keys():
-                outputstr += "Variable "+str(i)+" not declared! "
-                raise ("Variable "+str(i)+" not declared! ")
+                raise Exception("Variable "+str(i)+" not declared! ")
             elif "const" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "const" in declared_type[declared_id[i]]:
-                outputstr += "Cannot modify const!"
-                raise ("Cannot modify const!")
+                raise Exception("Cannot modify const: "+str(i)+"!")
             elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[declared_id[i]]:
                 stat += "%d "
             elif "double" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "double" in declared_type[declared_id[i]]:
@@ -878,8 +872,7 @@ def p_procedure_statement(p):
             elif "char" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "char" in declared_type[declared_id[i]]:
                 stat += "%s "
             else:
-                outputstr += "Error!"
-                raise ("Error!")
+                raise Exception("Cannot read this type!")
             if i==id_list[-1]:
                 stat=stat[:-1]
 
