@@ -5,14 +5,17 @@ from pascaltocconverter import *
 window = tk.Tk()
 window.title("Pascal to C converter")
 
-with open('test5.txt', 'r') as file:
+with open('test.txt', 'r') as file:
     text = file.read()
 
 
 def helloCallBack():
     data = inputTK.get(1.0, tk.END)
     outputTK.delete(1.0, tk.END)
-    outputTK.insert(1.0, init(data))
+    final_data = init(data)
+    outputTK.insert(1.0, final_data)
+    with open('results.txt', 'w') as file2:
+        file2.write(final_data)
 
 
 greeting = tk.Label(text="Pascal to C converter")
