@@ -119,7 +119,7 @@ def t_newline(t):
 
 def t_error(t):
     global outputstr
-    outputstr += "Illegal character {}".format(t.value[0]) + "\n"
+    outputstr += "Illegal character {} at line {}.".format(t.value[0],t.lexer.lineno) + "\n"
     t.lexer.skip(1)
 
 
@@ -270,7 +270,7 @@ def p_e(p):
     """e : ID"""
     global outputstr
     if p[1] != 'e':
-        outputstr += "Syntax error in input!\n"
+        raise ("Error!")
     else:
         if len(constdef) > 0:
             constdef.append(str(constdef.pop(-1)) + str(p[1]))
@@ -590,7 +590,7 @@ def p_function_header(p):
 
 def p_error(p):
     global outputstr
-    outputstr += "Syntax error in input!!!\n"
+    outputstr += "Syntax error at {}!\n".format(p.value)
 
 
 def p_empty(p):
@@ -835,7 +835,7 @@ def p_procedure_statement(p):
         for i in id_list:
             if str(i) not in declared_id.keys():
                 outputstr += "Variable " + str(i) + " not declared! "
-                raise ("Variable " + str(i) + " not declared! ")
+                raise ("Error!")
             elif "int" in str(declared_id[i]) or declared_id[i] in declared_type.keys() and "int" in declared_type[
                 declared_id[i]]:
                 stat += "%d "

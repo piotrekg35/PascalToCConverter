@@ -1,0 +1,4 @@
+program IllegalCharacter;
+begin
+    # writeln('Ala ma kota');
+end.

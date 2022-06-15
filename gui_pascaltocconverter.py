@@ -12,10 +12,13 @@ with open('test.txt', 'r') as file:
 def helloCallBack():
     data = inputTK.get(1.0, tk.END)
     outputTK.delete(1.0, tk.END)
-    final_data = init(data)
-    outputTK.insert(1.0, final_data)
-    with open('results.txt', 'w') as file2:
-        file2.write(final_data)
+    try:
+        final_data = init(data)
+        outputTK.insert(1.0, final_data)
+        with open('results.txt', 'w') as file2:
+            file2.write(final_data)
+    except Exception:
+        outputTK.insert(1.0, Exception)
 
 
 greeting = tk.Label(text="Pascal to C converter")
