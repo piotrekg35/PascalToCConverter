@@ -587,7 +587,7 @@ def p_function_header(p):
 
 
 def p_error(p):
-    raise Exception("Syntax error at {}!\n".format(p.value))
+    raise Exception("Syntax error at '{}' at line: {}.\n".format(p.value,p.lexer.lineno))
 
 
 def p_empty(p):
